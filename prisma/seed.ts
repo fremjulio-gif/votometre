@@ -996,6 +996,78 @@ async function main() {
     }
   }
 
+  // ==========================================
+  // 8. STATISTIQUES PARTICIPATION, ABSTENTION & SOCIOLOGIE DU VOTE
+  // ==========================================
+  console.log("\n📦 Ingesting Statistiques Participation, Abstention & Sociologie...");
+  const abstentionFile = path.join(dataDir, "statistiques_participation_abstention.xlsx");
+
+  if (fs.existsSync(abstentionFile)) {
+    const absWb = XLSX.readFile(abstentionFile);
+    const partRows: any[] = XLSX.utils.sheet_to_json(absWb.Sheets["Evolution_Participation"], { range: 3 });
+
+    for (const r of partRows) {
+      const scrutin = String(r["Scrutin"] || "");
+      const annee = Number(r["Année"]);
+      const tour = Number(r["Tour"]) || 1;
+      let prefix = "";
+      let scrutinType: ScrutinType = ScrutinType.PRESIDENTIELLE;
+
+      if (scrutin.includes("Présidentielle")) {
+        prefix = "presi";
+        scrutinType = ScrutinType.PRESIDENTIELLE;
+      } else if (scrutin.includes("Législatives")) {
+        prefix = "legis";
+        scrutinType = ScrutinType.LEGISLATIVE;
+      } else if (scrutin.includes("Européennes")) {
+        prefix = "euro";
+        scrutinType = ScrutinType.EUROPEENNE;
+      } else if (scrutin.includes("Municipales")) {
+        prefix = "muni";
+        scrutinType = ScrutinType.MUNICIPALE;
+      }
+
+      const slug = `${prefix}-${annee}-t${tour}`;
+      const inscrits = r["Inscrits"] ? Number(r["Inscrits"]) : null;
+      const votants = r["Votants"] ? Number(r["Votants"]) : null;
+      const exprimes = r["Suffrages Exprimés"] ? Number(r["Suffrages Exprimés"]) : null;
+      const votesBlancs = r["Votes Blancs"] ? Number(r["Votes Blancs"]) : null;
+      const votesNuls = r["Votes Nuls"] ? Number(r["Votes Nuls"]) : null;
+      const tauxAbstention =
+        inscrits && votants
+          ? Math.round(((inscrits - votants) / inscrits) * 10000) / 100
+          : null;
+      const dateScrutin = r["Date"] ? new Date(`${r["Date"]}T00:00:00.000Z`) : new Date(`${annee}-05-01T00:00:00.000Z`);
+
+      await prisma.election.upsert({
+        where: { slug },
+        update: {
+          inscrits,
+          votants,
+          exprimes,
+          tauxAbstention,
+          votesBlancs,
+          votesNuls,
+        },
+        create: {
+          slug,
+          type: scrutinType,
+          annee,
+          tour,
+          dateScrutin,
+          inscrits,
+          votants,
+          exprimes,
+          tauxAbstention,
+          votesBlancs,
+          votesNuls,
+        },
+      });
+    }
+
+    console.log(`✅ Ingested ${partRows.length} participation records into official elections.`);
+  }
+
   // Summary counts
   const totalElections = await prisma.election.count();
   const totalCandidats = await prisma.candidatOuListe.count();

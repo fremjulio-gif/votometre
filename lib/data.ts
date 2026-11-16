@@ -760,3 +760,254 @@ export async function getMunicipales2026Data(): Promise<MunicipalesData> {
     throw error;
   }
 }
+
+// ==========================================
+// SOCIOLOGIE DU VOTE & ABSTENTION DATA & TYPES
+// ==========================================
+
+export interface ParticipationHistoryRow {
+  scrutin: string;
+  annee: number;
+  tour: number;
+  date: string;
+  inscrits: number;
+  votants: number;
+  tauxParticipation: number;
+  abstentionnistes: number;
+  tauxAbstention: number;
+  votesBlancs: number;
+  votesNuls: number;
+  blancsNulsTotal: number;
+  partBlancsNulsVotants: number;
+  exprimes: number;
+}
+
+export interface TypologieInseeEvolution {
+  annee: number;
+  voteSystematique: number;
+  voteIntermittent: number;
+  abstentionSystematique: number;
+}
+
+export interface TypologieInseeDetail {
+  comportement: string;
+  part2002: number;
+  part2022: number;
+  ecart: number;
+}
+
+export interface FractureAgeRow {
+  trancheAge: string;
+  indicateur: string;
+  val2002: number;
+  val2007: number;
+  val2012: number;
+  val2017: number;
+  val2022: number;
+}
+
+export interface FractureDiplomeRow {
+  diplome: string;
+  indicateur: string;
+  val2002: number;
+  val2012: number;
+  val2017: number;
+  val2022: number;
+}
+
+export interface ProfilIpsosRow {
+  categorie: string;
+  sousGroupe: string;
+  votantsPct: number;
+  abstentionPct: number;
+}
+
+export interface MalInscriptionVolume {
+  indicateur: string;
+  source: string;
+  annee: number;
+  volume: number;
+  partPct: number;
+  commentaire: string;
+}
+
+export interface MalInscriptionAge {
+  trancheAge: string;
+  tauxPct: number;
+  source: string;
+  impact: string;
+}
+
+export interface ProcurationInegalite {
+  groupe: string;
+  tauxPct: number;
+  source: string;
+  rapport: string;
+}
+
+export interface SociologieAbstentionData {
+  participationHistory: ParticipationHistoryRow[];
+  typologie: {
+    evolution: TypologieInseeEvolution[];
+    details: TypologieInseeDetail[];
+  };
+  fractures: {
+    ages: FractureAgeRow[];
+    diplomes: FractureDiplomeRow[];
+  };
+  profilIpsos: ProfilIpsosRow[];
+  malInscription: {
+    volumes: MalInscriptionVolume[];
+    parAge: MalInscriptionAge[];
+    procurations: ProcurationInegalite[];
+  };
+}
+
+export async function getSociologieAbstentionData(): Promise<SociologieAbstentionData> {
+  if ((dataCache as any)?.abstention) {
+    return (dataCache as any).abstention;
+  }
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const xlsxMod = await import("xlsx");
+    const XLSX = (xlsxMod as any).default || xlsxMod;
+
+    const filePath = path.join(process.cwd(), "data", "statistiques_participation_abstention.xlsx");
+    if (!fs.existsSync(filePath)) {
+      throw new Error("No participation statistics file available");
+    }
+
+    const wb = XLSX.readFile(filePath);
+
+    // 1. History
+    const partRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Evolution_Participation"], { range: 3 });
+    const participationHistory: ParticipationHistoryRow[] = partRaw.map((r) => {
+      const inscrits = Number(r["Inscrits"] || 0);
+      const votants = Number(r["Votants"] || 0);
+      const exprimes = Number(r["Suffrages Exprimés"] || 0);
+      const blancs = Number(r["Votes Blancs"] || 0);
+      const nuls = Number(r["Votes Nuls"] || 0);
+      const blancsNuls = blancs + nuls;
+      return {
+        scrutin: String(r["Scrutin"]),
+        annee: Number(r["Année"]),
+        tour: Number(r["Tour"]),
+        date: String(r["Date"] || ""),
+        inscrits,
+        votants,
+        tauxParticipation: inscrits > 0 ? Math.round((votants / inscrits) * 1000) / 10 : 0,
+        abstentionnistes: inscrits - votants,
+        tauxAbstention: inscrits > 0 ? Math.round(((inscrits - votants) / inscrits) * 1000) / 10 : 0,
+        votesBlancs: blancs,
+        votesNuls: nuls,
+        blancsNulsTotal: blancsNuls,
+        partBlancsNulsVotants: votants > 0 ? Math.round((blancsNuls / votants) * 1000) / 10 : 0,
+        exprimes,
+      };
+    });
+
+    // 2. Typologie
+    const typologieRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Typologie_Vote_Insee"], { range: 4 });
+    const typologieEvolution: TypologieInseeEvolution[] = typologieRaw.slice(0, 5).map((r) => ({
+      annee: Number(r["Année Électorale"]),
+      voteSystematique: Math.round(Number(r["Vote Systématique (%)"]) * 1000) / 10,
+      voteIntermittent: Math.round(Number(r["Vote Intermittent (%)"]) * 1000) / 10,
+      abstentionSystematique: Math.round(Number(r["Abstention Systématique (%)"]) * 1000) / 10,
+    }));
+
+    const detailsRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Typologie_Vote_Insee"], { range: 13 });
+    const typologieDetails: TypologieInseeDetail[] = detailsRaw.slice(0, 7).map((r) => ({
+      comportement: String(r["Comportement Électoral Détaillé"]),
+      part2002: Math.round(Number(r["2002"]) * 1000) / 10,
+      part2022: Math.round(Number(r["2022"]) * 1000) / 10,
+      ecart: Math.round((Number(r["2022"]) - Number(r["2002"])) * 1000) / 10,
+    }));
+
+    // 3. Fractures
+    const ageRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Sociologie_Age_Diplome"], { range: 4 });
+    const fractureAges: FractureAgeRow[] = ageRaw
+      .filter((r) => r["Tranche d'Âge"] && r["Indicateur Électoral"])
+      .map((r) => ({
+        trancheAge: String(r["Tranche d'Âge"]),
+        indicateur: String(r["Indicateur Électoral"]),
+        val2002: Math.round(Number(r["2002"] || 0) * 1000) / 10,
+        val2007: Math.round(Number(r["2007"] || 0) * 1000) / 10,
+        val2012: Math.round(Number(r["2012"] || 0) * 1000) / 10,
+        val2017: Math.round(Number(r["2017"] || 0) * 1000) / 10,
+        val2022: Math.round(Number(r["2022"] || 0) * 1000) / 10,
+      }));
+
+    const diplomeRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Sociologie_Age_Diplome"], { range: 27 });
+    const fractureDiplomes: FractureDiplomeRow[] = diplomeRaw
+      .filter((r) => r["Niveau de Diplôme"] && r["Indicateur"])
+      .map((r) => ({
+        diplome: String(r["Niveau de Diplôme"]),
+        indicateur: String(r["Indicateur"]),
+        val2002: Math.round(Number(r["2002"] || 0) * 1000) / 10,
+        val2012: Math.round(Number(r["2012"] || 0) * 1000) / 10,
+        val2017: Math.round(Number(r["2017"] || 0) * 1000) / 10,
+        val2022: Math.round(Number(r["2022"] || 0) * 1000) / 10,
+      }));
+
+    // 4. Ipsos
+    const ipsosRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Profil_Abstention_Ipsos"], { range: 3 });
+    const profilIpsos: ProfilIpsosRow[] = ipsosRaw
+      .filter((r) => r["Catégorie Sociologique"] && r["Sous-Groupe"] && r["Abstentionnistes (%)"] !== undefined)
+      .map((r) => ({
+        categorie: String(r["Catégorie Sociologique"]),
+        sousGroupe: String(r["Sous-Groupe"]),
+        votantsPct: Math.round(Number(r["Votants (%)"] || 0) * 1000) / 10,
+        abstentionPct: Math.round(Number(r["Abstentionnistes (%)"] || 0) * 1000) / 10,
+      }));
+
+    // 5. Mal inscription
+    const miVolRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Mal_Inscription"], { range: 4 }).slice(0, 4);
+    const miAgeRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Mal_Inscription"], { range: 12 }).slice(0, 3);
+    const miProcRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Mal_Inscription"], { range: 19 }).slice(0, 4);
+
+    const malInscription = {
+      volumes: miVolRaw.map((r) => ({
+        indicateur: String(r["Indicateur"]),
+        source: String(r["Source Institutionnelle"]),
+        annee: Number(r["Année de Mesure"]),
+        volume: Number(r["Volume Estimé (Nombre de Citoyens)"]),
+        partPct: Math.round(Number(r["Part du Corps Électoral / Inscrits (%)"] || 0) * 1000) / 10,
+        commentaire: String(r["Commentaire & Portée Démocratique"] || ""),
+      })),
+      parAge: miAgeRaw.map((r) => ({
+        trancheAge: String(r["Tranche d'Âge"]),
+        tauxPct: Math.round(Number(r["Taux de Mal-inscription (%)"] || 0) * 1000) / 10,
+        source: String(r["Source Électorale"] || ""),
+        impact: String(r["Impact sur la Participation"] || ""),
+      })),
+      procurations: miProcRaw.map((r) => ({
+        groupe: String(r["Groupe Social / Revenu"]),
+        tauxPct: Math.round(Number(r["Taux de Vote par Procuration (%)"] || 0) * 1000) / 10,
+        source: String(r["Source & Auteur"] || ""),
+        rapport: String(r["Rapport d'Inégalité"] || ""),
+      })),
+    };
+
+    return {
+      participationHistory,
+      typologie: {
+        evolution: typologieEvolution,
+        details: typologieDetails,
+      },
+      fractures: {
+        ages: fractureAges,
+        diplomes: fractureDiplomes,
+      },
+      profilIpsos,
+      malInscription,
+    };
+  } catch (error) {
+    console.warn("Using fallback cache for getSociologieAbstentionData:", error);
+    if ((dataCache as any).abstention) {
+      return (dataCache as any).abstention;
+    }
+    throw error;
+  }
+}

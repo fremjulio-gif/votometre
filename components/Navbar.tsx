@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Législatives", href: "/legislatives" },
   { label: "Européennes", href: "/europeennes" },
   { label: "Municipales", href: "/municipales" },
+  { label: "Sociologie", href: "/abstention" },
   { label: "Instituts", href: "/instituts" },
   { label: "Méthode", href: "/methodologie" },
 ];

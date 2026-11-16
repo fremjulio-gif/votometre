@@ -25,6 +25,8 @@ model Election {
   votants         Int?
   exprimes        Int?
   tauxAbstention  Float?
+  votesBlancs     Int?
+  votesNuls       Int?
   commune         String?        // ex: "Paris", "Marseille", "Lyon", ou null pour national
   departement     String?        // ex: "Paris", "Bouches-du-Rhône", etc.
   resultats       ResultatReel[]

@@ -27,6 +27,9 @@ export function Footer() {
             <Link href="/municipales" className="hover:text-foreground transition-colors">
               Municipales
             </Link>
+            <Link href="/abstention" className="hover:text-foreground transition-colors">
+              Sociologie &amp; Abstention
+            </Link>
             <Link href="/instituts" className="hover:text-foreground transition-colors">
               Instituts
             </Link>

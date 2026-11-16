@@ -6,6 +6,7 @@ import {
   getLegislativesHemicycleData,
   getConsensusPointsByElection,
   getMunicipales2026Data,
+  getSociologieAbstentionData,
 } from "../lib/data";
 import { prisma } from "../lib/prisma";
 import * as fs from "fs";
@@ -19,6 +20,7 @@ async function main() {
   const instituts = await getLeaderboardInstituts();
   const prospectif = await getProspectif2027Data();
   const municipales = await getMunicipales2026Data();
+  const abstention = await getSociologieAbstentionData();
 
   const elections = await prisma.election.findMany({
     orderBy: [{ annee: "desc" }, { tour: "asc" }],
@@ -46,6 +48,7 @@ async function main() {
     instituts,
     prospectif,
     municipales,
+    abstention,
     elections,
     consensusMap,
     hemicycleMap,
