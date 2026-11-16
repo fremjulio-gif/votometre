@@ -1,0 +1,89 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ScrutinType {
+  PRESIDENTIELLE
+  EUROPEENNE
+  LEGISLATIVE
+}
+
+model Election {
+  id              String         @id @default(cuid())
+  slug            String         @unique // ex: "presi-2022-t1", "euro-2024"
+  type            ScrutinType
+  annee           Int
+  tour            Int            @default(1)
+  dateScrutin     DateTime
+  inscrits        Int?
+  votants         Int?
+  exprimes        Int?
+  tauxAbstention  Float?
+  resultats       ResultatReel[]
+  sondages        SondageVague[]
+}
+
+model CandidatOuListe {
+  id              String         @id @default(cuid())
+  nom             String
+  parti           String
+  famille         String         // Gauche, Bloc Central, Droite, Extrême Droite, Écologiste, etc.
+  couleurHex      String         // Code couleur officiel pour les graphiques
+  resultats       ResultatReel[]
+  mesuresSondages SondageMesure[]
+}
+
+model ResultatReel {
+  id              String          @id @default(cuid())
+  electionId      String
+  election        Election        @relation(fields: [electionId], references: [id])
+  candidatId      String
+  candidat        CandidatOuListe @relation(fields: [candidatId], references: [id])
+  voix            BigInt?
+  pourcentage     Float           // Score officiel en %
+  sieges          Int?            // Pour législatives et européennes
+  statut          String?         // Elu, Battu, Qualifie
+
+  @@unique([electionId, candidatId])
+}
+
+model Institut {
+  id              String         @id @default(cuid())
+  nom             String         @unique // Ipsos, Ifop, etc.
+  sondages        SondageVague[]
+}
+
+model SondageVague {
+  id                 String          @id @default(cuid())
+  codeSondage        String?
+  electionId         String
+  election           Election        @relation(fields: [electionId], references: [id])
+  institutId         String
+  institut           Institut        @relation(fields: [institutId], references: [id])
+  commanditaire      String?
+  dateDebut          DateTime?
+  dateFin            DateTime?
+  datePublication    DateTime
+  joursAvantScrutin  Int?
+  tailleEchantillon  Int?
+  methode            String?
+  statut             String?         // "Dernier sondage", "Rolling", etc.
+  estDernierSondage  Boolean         @default(false)
+  mesures            SondageMesure[]
+}
+
+model SondageMesure {
+  id                 String          @id @default(cuid())
+  sondageVagueId     String
+  sondageVague       SondageVague    @relation(fields: [sondageVagueId], references: [id])
+  candidatId         String
+  candidat           CandidatOuListe @relation(fields: [candidatId], references: [id])
+  intentionVotePct   Float
+  siegesMin          Int?
+  siegesMax          Int?
+}
