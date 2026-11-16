@@ -69,6 +69,10 @@ export default async function PresidentiellesPage() {
         institut: s.institut?.nom || s.institut,
         commanditaire: s.commanditaire,
         datePublication: s.datePublication instanceof Date ? s.datePublication.toISOString().split("T")[0] : String(s.datePublication).split("T")[0],
+        dateDebut: s.dateDebut ? (s.dateDebut instanceof Date ? s.dateDebut.toISOString().split("T")[0] : String(s.dateDebut).split("T")[0]) : null,
+        dateFin: s.dateFin ? (s.dateFin instanceof Date ? s.dateFin.toISOString().split("T")[0] : String(s.dateFin).split("T")[0]) : null,
+        tailleEchantillon: s.tailleEchantillon,
+        methode: s.methode,
         hypothese: s.statut || s.hypothese || "Hypothèse 2027",
         mesures: s.mesures?.map((m: any) => ({
           candidatNom: m.candidat?.nom || m.candidatNom,
