@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: "Présidentielles", href: "/presidentielles" },
   { label: "Législatives", href: "/legislatives" },
   { label: "Européennes", href: "/europeennes" },
+  { label: "Municipales", href: "/municipales" },
   { label: "Instituts", href: "/instituts" },
   { label: "Méthode", href: "/methodologie" },
 ];

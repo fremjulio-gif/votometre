@@ -11,14 +11,17 @@ function getDbUrl(): string {
     return process.env.DATABASE_URL;
   }
 
-  const isVercel = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+  const isVercel = process.env.VERCEL === "1";
   const sourceDbPath = path.join(process.cwd(), "prisma", "dev.db");
 
   if (isVercel) {
     try {
       // In Vercel serverless functions, /tmp is writable
       const tmpDbPath = path.join("/tmp", "dev.db");
-      if (!fs.existsSync(tmpDbPath)) {
+      if (
+        !fs.existsSync(tmpDbPath) ||
+        (fs.existsSync(sourceDbPath) && fs.statSync(sourceDbPath).mtimeMs > fs.statSync(tmpDbPath).mtimeMs)
+      ) {
         if (fs.existsSync(sourceDbPath)) {
           fs.copyFileSync(sourceDbPath, tmpDbPath);
         }

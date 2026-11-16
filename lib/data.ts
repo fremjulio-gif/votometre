@@ -466,3 +466,297 @@ export async function getLegislativesHemicycleData(annee = 2024) {
     return (dataCache.hemicycleMap as Record<number, any>)[annee] || null;
   }
 }
+
+// ==========================================
+// MUNICIPALES 2026 DATA & TYPES
+// ==========================================
+
+export interface MunicipaleParticipation {
+  tour1: {
+    inscrits: number;
+    votants: number;
+    tauxVotants: number;
+    abstentions: number;
+    tauxAbstention: number;
+    exprimes: number;
+    blancs: number;
+    nuls: number;
+  };
+  tour2: {
+    inscrits: number;
+    votants: number;
+    tauxVotants: number;
+    abstentions: number;
+    tauxAbstention: number;
+    exprimes: number;
+    blancs: number;
+    nuls: number;
+  };
+  horaires: Array<{
+    horaire: string;
+    t1_2026: number;
+    t2_2026: number;
+    t1_2020: number;
+    t2_2020: number;
+    ecart_t1: number;
+    ecart_t2: number;
+  }>;
+}
+
+export interface MunicipaleEnjeu {
+  thematique: string;
+  institut: string;
+  importance: number;
+  commentaire: string;
+}
+
+export interface MunicipaleWitnessCandidate {
+  nom: string;
+  parti: string;
+  nuance: string;
+  sondagePct: number;
+  reelPct: number;
+  delta: number;
+  absDelta: number;
+  couleurHex: string;
+  statutMarge: "SOUS_ESTIME" | "SUR_ESTIME" | "DANS_MARGE";
+}
+
+export interface MunicipaleWitnessCity {
+  id: string;
+  ville: string;
+  tour: number;
+  label: string;
+  candidates: MunicipaleWitnessCandidate[];
+}
+
+export interface MunicipaleVille100k {
+  commune: string;
+  departement: string;
+  maireSortant: string;
+  partiSortant: string;
+  maireElu: string;
+  partiElu: string;
+  evolution: string;
+  categorie: "maintien" | "gauche" | "droite" | "centre" | "rn" | "autre";
+  scoreVainqueur: string;
+  detail: string;
+}
+
+export interface MunicipaleNuance {
+  nuance: string;
+  sigle: string;
+  pctT1: number;
+  voixT1: number;
+  siegesT1: number;
+  villesT1: number;
+  pctT2: number;
+  voixT2: number;
+  siegesT2: number;
+  villesT2: number;
+  totalSieges: number;
+  totalVilles: number;
+  couleurHex: string;
+}
+
+export interface MunicipalesData {
+  participation: MunicipaleParticipation;
+  enjeux: MunicipaleEnjeu[];
+  witnessCities: MunicipaleWitnessCity[];
+  villes100k: MunicipaleVille100k[];
+  nuances: MunicipaleNuance[];
+}
+
+function resolveNuanceColor(nuance: string): string {
+  const n = nuance.toUpperCase();
+  if (n.includes("PS") || n.includes("SOC") || n.includes("UG") || n.includes("GAUCHE") || n.includes("DVG")) {
+    if (n.includes("LFI") || n.includes("FI")) return "#991B1B";
+    if (n.includes("PCF") || n.includes("COM")) return "#DC2626";
+    return "#E11D48";
+  }
+  if (n.includes("LÉ") || n.includes("VEC") || n.includes("ECO")) return "#059669";
+  if (n.includes("HOR")) return "#0284C7";
+  if (n.includes("MODEM") || n.includes("MDM")) return "#D97706";
+  if (n.includes("DVC") || n.includes("CENTRE") || n.includes("UC") || n.includes("RE")) return "#F59E0B";
+  if (n.includes("RN") || n.includes("EXD") || n.includes("UXD")) return "#1E293B";
+  if (n.includes("REC")) return "#7E22CE";
+  if (n.includes("LR") || n.includes("DVD") || n.includes("UD") || n.includes("DROITE")) return "#2563EB";
+  if (n.includes("UDI")) return "#0EA5E9";
+  return "#64748B";
+}
+
+export async function getMunicipales2026Data(): Promise<MunicipalesData> {
+  if ((dataCache as any)?.municipales) {
+    return (dataCache as any).municipales;
+  }
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const xlsxMod = await import("xlsx");
+    const XLSX = (xlsxMod as any).default || xlsxMod;
+
+    const filePath = path.join(process.cwd(), "data", "resultats_municipales_2026.xlsx");
+    if (!fs.existsSync(filePath)) {
+      throw new Error("No municipals data file available");
+    }
+
+    const wb = XLSX.readFile(filePath);
+
+    // 1. Synthese Participation
+    const participation: MunicipaleParticipation = {
+      tour1: {
+        inscrits: 48474213,
+        votants: 27678488,
+        tauxVotants: 57.10,
+        abstentions: 20795725,
+        tauxAbstention: 42.90,
+        exprimes: 26182365,
+        blancs: 734805,
+        nuls: 761318,
+      },
+      tour2: {
+        inscrits: 16879356,
+        votants: 9625762,
+        tauxVotants: 57.03,
+        abstentions: 7253594,
+        tauxAbstention: 42.97,
+        exprimes: 9391407,
+        blancs: 139617,
+        nuls: 94738,
+      },
+      horaires: [
+        { horaire: "12h00", t1_2026: 19.37, t2_2026: 20.33, t1_2020: 18.38, t2_2020: 15.29, ecart_t1: +0.99, ecart_t2: +5.04 },
+        { horaire: "17h00", t1_2026: 48.90, t2_2026: 48.10, t1_2020: 38.77, t2_2020: 34.67, ecart_t1: +10.13, ecart_t2: +13.43 },
+        { horaire: "Final (20h)", t1_2026: 57.10, t2_2026: 57.03, t1_2020: 44.66, t2_2020: 41.86, ecart_t1: +12.44, ecart_t2: +15.17 },
+      ],
+    };
+
+    // 2. Enjeux du vote
+    const enjeuxSheet: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Enjeux_Sondages_2026"], { range: 4 });
+    const enjeux: MunicipaleEnjeu[] = enjeuxSheet.slice(0, 4).map((r) => ({
+      thematique: String(r["Thématique d'enjeu"] || ""),
+      institut: String(r["Institut de sondage"] || ""),
+      importance: Math.round(Number(r["Niveau d'importance mesuré"]) * 100),
+      commentaire: String(r["Commentaire analytique"] || ""),
+    }));
+
+    // 3. Nuances Nationales
+    const nuancesRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Resultats_Nuances_National"], { range: 3 });
+    const nuances: MunicipaleNuance[] = nuancesRaw
+      .filter((r) => r["Nuance Politique"] && !String(r["Nuance Politique"]).includes("TOTAL"))
+      .map((r) => {
+        const sigle = String(r["Sigle"] || "DIV");
+        const pctT1 = r["% Exprimés T1"] ? Math.round(Number(r["% Exprimés T1"]) * 10000) / 100 : 0;
+        const pctT2 = r["% Exprimés T2"] ? Math.round(Number(r["% Exprimés T2"]) * 10000) / 100 : 0;
+        const voixT1 = r["Voix T1"] ? Number(r["Voix T1"]) : 0;
+        const voixT2 = r["Voix T2"] ? Number(r["Voix T2"]) : 0;
+        const siegesT1 = r["Sièges T1"] ? Number(r["Sièges T1"]) : 0;
+        const siegesT2 = r["Sièges T2"] ? Number(r["Sièges T2"]) : 0;
+        const villesT1 = r["Villes Gagnées T1"] ? Number(r["Villes Gagnées T1"]) : 0;
+        const villesT2 = r["Villes Gagnées T2"] ? Number(r["Villes Gagnées T2"]) : 0;
+        return {
+          nuance: String(r["Nuance Politique"]),
+          sigle,
+          pctT1,
+          voixT1,
+          siegesT1,
+          villesT1,
+          pctT2,
+          voixT2,
+          siegesT2,
+          villesT2,
+          totalSieges: siegesT1 + siegesT2,
+          totalVilles: villesT1 + villesT2,
+          couleurHex: resolveNuanceColor(sigle),
+        };
+      })
+      .sort((a, b) => (b.pctT1 + b.pctT2) - (a.pctT1 + a.pctT2));
+
+    // 4. 42 Métropoles (+100k hab)
+    const villesRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Grandes_Villes_100k"], { range: 3 });
+    const villes100k: MunicipaleVille100k[] = villesRaw.map((r) => {
+      const evo = String(r["Évolution Politique"] || "Maintien");
+      let cat: MunicipaleVille100k["categorie"] = "autre";
+      const evoLower = evo.toLowerCase();
+      if (evoLower.includes("maintien")) cat = "maintien";
+      else if (evoLower.includes("gauche") || evoLower.includes("ps") || evoLower.includes("lfi") || evoLower.includes("écologiste")) cat = "gauche";
+      else if (evoLower.includes("droite") && !evoLower.includes("nationale")) cat = "droite";
+      else if (evoLower.includes("centre") || evoLower.includes("majorité pres.")) cat = "centre";
+      else if (evoLower.includes("rn") || evoLower.includes("nationale")) cat = "rn";
+
+      return {
+        commune: String(r["Commune"]),
+        departement: String(r["Département"] || ""),
+        maireSortant: String(r["Maire Sortant(e)"] || ""),
+        partiSortant: String(r["Parti Sortant"] || ""),
+        maireElu: String(r["Maire Élu(e) 2026"] || ""),
+        partiElu: String(r["Parti Élu 2026"] || ""),
+        evolution: evo,
+        categorie: cat,
+        scoreVainqueur: String(r["Score Vainqueur"] || "-"),
+        detail: String(r["Détail / Configuration de Vote"] || ""),
+      };
+    });
+
+    // 5. Métropoles témoins (Sondage vs Réel)
+    const witnessRaw: any[] = XLSX.utils.sheet_to_json(wb.Sheets["Enjeux_Sondages_2026"], { range: 12 });
+    const cityGroupMap = new Map<string, MunicipaleWitnessCity>();
+
+    for (const w of witnessRaw) {
+      const ville = String(w["Ville"]);
+      const tourStr = String(w["Tour"] || "1er tour");
+      const tour = tourStr.includes("2") ? 2 : 1;
+      const key = `${ville}-t${tour}`;
+
+      if (!cityGroupMap.has(key)) {
+        cityGroupMap.set(key, {
+          id: key,
+          ville,
+          tour,
+          label: `${ville} (${tour === 1 ? "1er tour" : "2nd tour"})`,
+          candidates: [],
+        });
+      }
+
+      const sondage = Math.round(Number(w["Estimation Sondeur"]) * 1000) / 10;
+      const reel = Math.round(Number(w["Résultat Proclamé"]) * 1000) / 10;
+      const delta = Math.round((reel - sondage) * 10) / 10;
+      const absDelta = Math.abs(delta);
+      const nuance = String(w["Nuance"] || "DIV");
+
+      let statutMarge: MunicipaleWitnessCandidate["statutMarge"] = "DANS_MARGE";
+      if (absDelta > 2.0) {
+        statutMarge = delta > 0 ? "SOUS_ESTIME" : "SUR_ESTIME";
+      }
+
+      cityGroupMap.get(key)!.candidates.push({
+        nom: String(w["Candidat / Tête de liste"]),
+        parti: nuance,
+        nuance,
+        sondagePct: sondage,
+        reelPct: reel,
+        delta,
+        absDelta,
+        couleurHex: resolveNuanceColor(nuance),
+        statutMarge,
+      });
+    }
+
+    const witnessCities = Array.from(cityGroupMap.values());
+
+    return {
+      participation,
+      enjeux,
+      witnessCities,
+      villes100k,
+      nuances,
+    };
+  } catch (error) {
+    console.warn("Using fallback cache for getMunicipales2026Data:", error);
+    if ((dataCache as any).municipales) {
+      return (dataCache as any).municipales;
+    }
+    throw error;
+  }
+}

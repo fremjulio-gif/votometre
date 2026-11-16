@@ -5,6 +5,7 @@ import {
   getProspectif2027Data,
   getLegislativesHemicycleData,
   getConsensusPointsByElection,
+  getMunicipales2026Data,
 } from "../lib/data";
 import { prisma } from "../lib/prisma";
 import * as fs from "fs";
@@ -13,12 +14,11 @@ import * as path from "path";
 async function main() {
   console.log("Generating static data cache for Vercel...");
 
-  const [macro, allPoints, instituts, prospectif] = await Promise.all([
-    getMacroMetrics(),
-    getAllStatPoints(),
-    getLeaderboardInstituts(),
-    getProspectif2027Data(),
-  ]);
+  const macro = await getMacroMetrics();
+  const allPoints = await getAllStatPoints();
+  const instituts = await getLeaderboardInstituts();
+  const prospectif = await getProspectif2027Data();
+  const municipales = await getMunicipales2026Data();
 
   const elections = await prisma.election.findMany({
     orderBy: [{ annee: "desc" }, { tour: "asc" }],
@@ -45,6 +45,7 @@ async function main() {
     allPoints,
     instituts,
     prospectif,
+    municipales,
     elections,
     consensusMap,
     hemicycleMap,

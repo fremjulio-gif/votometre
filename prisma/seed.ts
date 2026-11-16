@@ -11,37 +11,37 @@ function getPolitiqueMetadata(nom: string, parti: string, familleInput?: string)
   const n = (nom || "").toUpperCase();
   const f = (familleInput || "").toUpperCase();
 
-  if (p.includes("LO") || p.includes("NPA") || n.includes("ARTHAUD") || n.includes("POUTOU") || n.includes("LAGUILLER") || n.includes("BESANCENOT")) {
+  if (p.includes("LO") || p.includes("NPA") || p === "EXG" || n.includes("ARTHAUD") || n.includes("POUTOU") || n.includes("LAGUILLER") || n.includes("BESANCENOT")) {
     return { famille: "Extrême gauche", couleurHex: "#922B21" };
   }
-  if (p.includes("LFI") || p.includes("FI") || n.includes("MÉLENCHON") || n.includes("MELENCHON") || p.includes("PG") || f.includes("GAUCHE RADICALE") || n.includes("AUBRY")) {
+  if (p.includes("LFI") || p === "FI" || n.includes("MÉLENCHON") || n.includes("MELENCHON") || n.includes("CHIKIROU") || p.includes("PG") || f.includes("GAUCHE RADICALE") || n.includes("AUBRY")) {
     return { famille: "Gauche radicale", couleurHex: "#C0392B" };
   }
-  if (p.includes("PCF") || n.includes("ROUSSEL") || n.includes("BUFFET") || n.includes("HUE") || n.includes("DEFFONTAINES")) {
+  if (p === "COM" || p.includes("PCF") || n.includes("ROUSSEL") || n.includes("LECOQ") || n.includes("BUFFET") || n.includes("HUE") || n.includes("DEFFONTAINES")) {
     return { famille: "Parti communiste", couleurHex: "#CB4335" };
   }
-  if (p.includes("NFP") || n.includes("NOUVEAU FRONT POPULAIRE") || n.includes("UNION DE LA GAUCHE") || p.includes("NUPES") || n.includes("GAUCHE PLURIELLE")) {
+  if (p === "UG" || p.includes("NFP") || p.includes("NOUVEAU FRONT POPULAIRE") || p.includes("UNION DE LA GAUCHE") || p.includes("NUPES") || f.includes("UNION DE LA GAUCHE")) {
     return { famille: "Union de la gauche", couleurHex: "#C0392B" };
   }
-  if (p.includes("EELV") || p.includes("ECOL") || n.includes("JADOT") || n.includes("TONDELIER") || n.includes("VOYNET") || n.includes("MAMÈRE") || n.includes("JOLY") || n.includes("TOUSSAINT")) {
+  if (p === "VEC" || p.includes("EELV") || p.includes("ECOL") || p === "ECO" || n.includes("JADOT") || n.includes("TONDELIER") || n.includes("DOUCET") || n.includes("HURMIC") || n.includes("DENIS") || n.includes("VOYNET")) {
     return { famille: "Écologiste", couleurHex: "#27AE60" };
   }
-  if (p.includes("PS") || p.includes("PRG") || p.includes("PP") || n.includes("GLUCKSMANN") || n.includes("HOLLANDE") || n.includes("ROYAL") || n.includes("JOSPIN") || n.includes("HAMON") || n.includes("HIDALGO") || f.includes("GAUCHE")) {
-    return { famille: "Gauche républicaine", couleurHex: "#E74C3C" };
+  if (p === "SOC" || p.includes("PS") || p === "DVG" || p.includes("PRG") || p.includes("PP") || n.includes("GLUCKSMANN") || n.includes("PAYAN") || n.includes("GRÉGOIRE") || n.includes("GREGOIRE") || n.includes("MAYER-ROSSIGNOL") || n.includes("MARBOT") || n.includes("HOLLANDE") || n.includes("ROYAL") || n.includes("JOSPIN") || n.includes("HAMON") || n.includes("HIDALGO") || f.includes("GAUCHE")) {
+    return { famille: "Gauche républicaine & DVG", couleurHex: "#E74C3C" };
   }
-  if (p.includes("ENS") || p.includes("LREM") || p.includes("RENAISSANCE") || p.includes("MODEM") || p.includes("HOR") || n.includes("MACRON") || n.includes("ATTAL") || n.includes("PHILIPPE") || n.includes("HAYER") || n.includes("BAYROU") || f.includes("CENTRE") || f.includes("MAJORITÉ PRÉSIDENTIELLE")) {
-    return { famille: "Bloc central", couleurHex: "#F39C12" };
+  if (p === "DVC" || p === "UC" || p === "RE" || p.includes("ENS") || p.includes("LREM") || p.includes("RENAISSANCE") || p.includes("MODEM") || p.includes("HOR") || n.includes("MACRON") || n.includes("ATTAL") || n.includes("PHILIPPE") || n.includes("ARMAND") || n.includes("CAZENAVE") || n.includes("BÉCHU") || n.includes("BECHU") || n.includes("HAYER") || n.includes("BAYROU") || f.includes("CENTRE") || f.includes("MAJORITÉ PRÉSIDENTIELLE")) {
+    return { famille: "Bloc central & DVC", couleurHex: "#F39C12" };
   }
-  if (p.includes("LR") || p.includes("UMP") || p.includes("RPR") || p.includes("UDF") || n.includes("CHIRAC") || n.includes("SARKOZY") || n.includes("FILLON") || n.includes("PÉCRESSE") || n.includes("BELLAMY") || n.includes("RETAILLEAU") || n.includes("WAUQUIEZ") || f.includes("DROITE")) {
-    return { famille: "Droite républicaine", couleurHex: "#2980B9" };
+  if (p === "DVD" || p === "UD" || p === "UDI" || p === "LFA" || p.includes("LR") || p.includes("UMP") || p.includes("RPR") || p.includes("UDF") || n.includes("DATI") || n.includes("AULAS") || n.includes("MOUDENC") || n.includes("FAGAUT") || n.includes("MOTHRON") || n.includes("JOISSAINS") || n.includes("CHIRAC") || n.includes("SARKOZY") || n.includes("FILLON") || n.includes("PÉCRESSE") || n.includes("BELLAMY") || n.includes("RETAILLEAU") || n.includes("WAUQUIEZ") || f.includes("DROITE")) {
+    return { famille: "Droite républicaine & DVD", couleurHex: "#2980B9" };
   }
   if (p.includes("REC") || n.includes("ZEMMOUR") || n.includes("MARÉCHAL") || n.includes("MARECHAL")) {
     return { famille: "Reconquête", couleurHex: "#8E44AD" };
   }
-  if (p.includes("RN") || p.includes("FN") || n.includes("LE PEN") || n.includes("BARDELLA") || n.includes("CIOTTI") || f.includes("EXTRÊME DROITE") || f.includes("NATIONALISTE")) {
-    return { famille: "Rassemblement National", couleurHex: "#1B4F72" };
+  if (p === "UXD" || p === "UDR" || p === "EXD" || p.includes("RN") || p.includes("FN") || n.includes("ALLISIO") || n.includes("LE PEN") || n.includes("BARDELLA") || n.includes("CIOTTI") || f.includes("EXTRÊME DROITE") || f.includes("NATIONALISTE")) {
+    return { famille: "Rassemblement National & Alliés", couleurHex: "#1B4F72" };
   }
-  if (p.includes("DLF") || n.includes("DUPONT-AIGNAN") || p.includes("UPR") || n.includes("ASSELINEAU") || n.includes("LASSALLE") || n.includes("RÉSISTONS")) {
+  if (p === "REG" || p === "DSV" || p === "DIV" || p.includes("DLF") || n.includes("DUPONT-AIGNAN") || p.includes("UPR") || n.includes("ASSELINEAU") || n.includes("LASSALLE") || n.includes("RÉSISTONS")) {
     return { famille: "Souverainistes & Divers", couleurHex: "#7F8C8D" };
   }
   return { famille: familleInput || "Autre", couleurHex: "#7F8C8D" };
@@ -771,6 +771,226 @@ async function main() {
           intentionVotePct,
           siegesMin,
           siegesMax,
+        },
+      });
+    }
+  }
+
+  // ==========================================
+  // 7. ELECTIONS MUNICIPALES 2026
+  // ==========================================
+  console.log("\n📦 Ingesting Élections Municipales 2026...");
+  const muniFile = path.join(dataDir, "resultats_municipales_2026.xlsx");
+
+  if (fs.existsSync(muniFile)) {
+    const muniWb = XLSX.readFile(muniFile);
+    const muniNuanceRows: any[] = XLSX.utils.sheet_to_json(muniWb.Sheets["Resultats_Nuances_National"], { range: 3 });
+    const muniVillesRows: any[] = XLSX.utils.sheet_to_json(muniWb.Sheets["Grandes_Villes_100k"], { range: 3 });
+    const muniWitnessRows: any[] = XLSX.utils.sheet_to_json(muniWb.Sheets["Enjeux_Sondages_2026"], { range: 12 });
+
+    // 1. Synthese Participation National T1 & T2
+    const elMuniT1 = await prisma.election.upsert({
+      where: { slug: "muni-2026-t1" },
+      update: {
+        inscrits: 48474213,
+        votants: 27678488,
+        exprimes: 26182365,
+        tauxAbstention: 42.9,
+      },
+      create: {
+        slug: "muni-2026-t1",
+        type: ScrutinType.MUNICIPALE,
+        annee: 2026,
+        tour: 1,
+        dateScrutin: new Date("2026-03-15T00:00:00.000Z"),
+        inscrits: 48474213,
+        votants: 27678488,
+        exprimes: 26182365,
+        tauxAbstention: 42.9,
+      },
+    });
+    electionMap.set("muni-2026-t1", elMuniT1.id);
+
+    const elMuniT2 = await prisma.election.upsert({
+      where: { slug: "muni-2026-t2" },
+      update: {
+        inscrits: 16879356,
+        votants: 9625762,
+        exprimes: 9391407,
+        tauxAbstention: 42.97,
+      },
+      create: {
+        slug: "muni-2026-t2",
+        type: ScrutinType.MUNICIPALE,
+        annee: 2026,
+        tour: 2,
+        dateScrutin: new Date("2026-03-22T00:00:00.000Z"),
+        inscrits: 16879356,
+        votants: 9625762,
+        exprimes: 9391407,
+        tauxAbstention: 42.97,
+      },
+    });
+    electionMap.set("muni-2026-t2", elMuniT2.id);
+
+    // 2. Resultats Nuances National
+    for (const r of muniNuanceRows) {
+      const nuanceNom = r["Nuance Politique"];
+      const sigle = r["Sigle"] || "DIV";
+      if (!nuanceNom || String(nuanceNom).includes("TOTAL")) continue;
+
+      const candidatId = await getOrCreateCandidat(
+        `${nuanceNom} (${sigle})`,
+        sigle,
+        nuanceNom,
+        `muni_nuance_${sigle}`
+      );
+
+      // T1
+      if (r["% Exprimés T1"] || r["Voix T1"]) {
+        const voixT1 = r["Voix T1"] ? BigInt(Math.round(Number(r["Voix T1"]))) : null;
+        const pctT1 = normalizePct(r["% Exprimés T1"]);
+        const siegesT1 = r["Sièges T1"] ? Number(r["Sièges T1"]) : null;
+        const villesT1 = r["Villes Gagnées T1"] ? Number(r["Villes Gagnées T1"]) : 0;
+        await prisma.resultatReel.upsert({
+          where: { electionId_candidatId: { electionId: elMuniT1.id, candidatId } },
+          update: { voix: voixT1, pourcentage: pctT1, sieges: siegesT1, statut: `${villesT1} villes remportées (T1)` },
+          create: { electionId: elMuniT1.id, candidatId, voix: voixT1, pourcentage: pctT1, sieges: siegesT1, statut: `${villesT1} villes remportées (T1)` },
+        });
+      }
+
+      // T2
+      if (r["% Exprimés T2"] || r["Voix T2"]) {
+        const voixT2 = r["Voix T2"] ? BigInt(Math.round(Number(r["Voix T2"]))) : null;
+        const pctT2 = normalizePct(r["% Exprimés T2"]);
+        const siegesT2 = r["Sièges T2"] ? Number(r["Sièges T2"]) : null;
+        const villesT2 = r["Villes Gagnées T2"] ? Number(r["Villes Gagnées T2"]) : 0;
+        await prisma.resultatReel.upsert({
+          where: { electionId_candidatId: { electionId: elMuniT2.id, candidatId } },
+          update: { voix: voixT2, pourcentage: pctT2, sieges: siegesT2, statut: `${villesT2} villes remportées (T2)` },
+          create: { electionId: elMuniT2.id, candidatId, voix: voixT2, pourcentage: pctT2, sieges: siegesT2, statut: `${villesT2} villes remportées (T2)` },
+        });
+      }
+    }
+
+    // 3. Grandes Villes (42 communes de +100k)
+    for (const r of muniVillesRows) {
+      const commune = r["Commune"];
+      if (!commune) continue;
+      const departement = r["Département"] || "";
+      const slugCommune = `muni-2026-${normalizeKey(commune).replace(/\s+/g, "-")}`;
+
+      const elCity = await prisma.election.upsert({
+        where: { slug: slugCommune },
+        update: { commune, departement },
+        create: {
+          slug: slugCommune,
+          type: ScrutinType.MUNICIPALE,
+          annee: 2026,
+          tour: 2,
+          dateScrutin: new Date("2026-03-22T00:00:00.000Z"),
+          commune,
+          departement,
+        },
+      });
+
+      const maireElu = r["Maire Élu(e) 2026"] || "Maire";
+      const partiElu = r["Parti Élu 2026"] || "Indépendant";
+      const evolution = r["Évolution Politique"] || "Maintien";
+
+      const candidatId = await getOrCreateCandidat(
+        maireElu,
+        partiElu,
+        undefined,
+        `maire_2026_${normalizeKey(commune)}`
+      );
+
+      await prisma.resultatReel.upsert({
+        where: { electionId_candidatId: { electionId: elCity.id, candidatId } },
+        update: {
+          pourcentage: 50.0,
+          statut: evolution,
+          commune,
+          departement,
+        },
+        create: {
+          electionId: elCity.id,
+          candidatId,
+          pourcentage: 50.0,
+          statut: evolution,
+          commune,
+          departement,
+        },
+      });
+    }
+
+    // 4. Enquêtes & Confrontation Sondages vs Réel dans les Métropoles témoins
+    const defaultInstitutId = await getOrCreateInstitut("Ipsos");
+
+    for (const w of muniWitnessRows) {
+      const ville = w["Ville"];
+      const candidatNom = w["Candidat / Tête de liste"];
+      if (!ville || !candidatNom) continue;
+
+      const nuance = w["Nuance"] || "DIV";
+      const tourStr = w["Tour"] || "1er tour";
+      const tour = tourStr.includes("2") ? 2 : 1;
+      const dateVote = tour === 1 ? new Date("2026-03-15T00:00:00.000Z") : new Date("2026-03-22T00:00:00.000Z");
+      const slugWitness = `muni-2026-${normalizeKey(ville).replace(/\s+/g, "-")}-t${tour}`;
+
+      let elWitness = await prisma.election.findUnique({ where: { slug: slugWitness } });
+      if (!elWitness) {
+        elWitness = await prisma.election.create({
+          data: {
+            slug: slugWitness,
+            type: ScrutinType.MUNICIPALE,
+            annee: 2026,
+            tour,
+            dateScrutin: dateVote,
+            commune: ville,
+          },
+        });
+      }
+
+      // Check or create candidate
+      const candKey = `muni_witness_${normalizeKey(ville)}_${normalizeKey(candidatNom)}`;
+      const candidatId = await getOrCreateCandidat(candidatNom, nuance, undefined, candKey);
+
+      // Real result
+      const scoreReel = normalizePct(w["Résultat Proclamé"]);
+      await prisma.resultatReel.upsert({
+        where: { electionId_candidatId: { electionId: elWitness.id, candidatId } },
+        update: { pourcentage: scoreReel, statut: "Candidat Métropole" },
+        create: { electionId: elWitness.id, candidatId, pourcentage: scoreReel, statut: "Candidat Métropole" },
+      });
+
+      // Sondage Vague for this city election
+      const codeSondage = `POLL_MUNI_2026_${normalizeKey(ville).toUpperCase()}_T${tour}`;
+      let vague = await prisma.sondageVague.findFirst({
+        where: { electionId: elWitness.id, codeSondage },
+      });
+
+      if (!vague) {
+        vague = await prisma.sondageVague.create({
+          data: {
+            codeSondage,
+            electionId: elWitness.id,
+            institutId: defaultInstitutId,
+            commanditaire: `Sondage de veille ${ville}`,
+            datePublication: dateVote,
+            estDernierSondage: true,
+            statut: `Veille scrutin ${ville} (Tour ${tour})`,
+          },
+        });
+      }
+
+      // Sondage Mesure
+      const intentionPct = normalizePct(w["Estimation Sondeur"]);
+      await prisma.sondageMesure.create({
+        data: {
+          sondageVagueId: vague.id,
+          candidatId,
+          intentionVotePct: intentionPct,
         },
       });
     }

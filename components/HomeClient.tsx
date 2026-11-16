@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ScoreBarChart } from "@/components/ScoreBarChart";
-import { ArrowRight, AlertCircle, CheckCircle2, Zap, Vote, Landmark, Globe, Award, Sparkles } from "lucide-react";
+import { ArrowRight, AlertCircle, CheckCircle2, Zap, Vote, Landmark, Globe, Award, Sparkles, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { StatPoint } from "@/lib/stats";
 
@@ -130,7 +130,7 @@ export function HomeClient({ pointsToDisplay }: HomeClientProps) {
         <h3 className="text-base font-bold text-foreground">
           Explorer l'Observatoire
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <Link
             href="/presidentielles"
             className="editorial-card p-5 hover:bg-secondary/40 transition-all flex flex-col justify-between group active:scale-[0.98]"
@@ -186,6 +186,27 @@ export function HomeClient({ pointsToDisplay }: HomeClientProps) {
               </span>
               <span className="text-xs text-muted-foreground block">
                 2004 à 2024 &amp; seuil de 5%
+              </span>
+            </div>
+            <div className="pt-4 flex items-center justify-between text-xs text-muted-foreground group-hover:text-foreground">
+              <span>Consulter</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+
+          <Link
+            href="/municipales"
+            className="editorial-card p-5 hover:bg-secondary/40 transition-all flex flex-col justify-between group active:scale-[0.98]"
+          >
+            <div className="space-y-1.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <span className="font-bold text-foreground block text-sm group-hover:text-primary transition-colors">
+                Municipales
+              </span>
+              <span className="text-xs text-muted-foreground block">
+                2026 : 42 métropoles &amp; enjeux
               </span>
             </div>
             <div className="pt-4 flex items-center justify-between text-xs text-muted-foreground group-hover:text-foreground">

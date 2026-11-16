@@ -11,11 +11,12 @@ enum ScrutinType {
   PRESIDENTIELLE
   EUROPEENNE
   LEGISLATIVE
+  MUNICIPALE
 }
 
 model Election {
   id              String         @id @default(cuid())
-  slug            String         @unique // ex: "presi-2022-t1", "euro-2024"
+  slug            String         @unique // ex: "presi-2022-t1", "muni-2026-t1", "muni-2026-paris-t1"
   type            ScrutinType
   annee           Int
   tour            Int            @default(1)
@@ -24,6 +25,8 @@ model Election {
   votants         Int?
   exprimes        Int?
   tauxAbstention  Float?
+  commune         String?        // ex: "Paris", "Marseille", "Lyon", ou null pour national
+  departement     String?        // ex: "Paris", "Bouches-du-Rhône", etc.
   resultats       ResultatReel[]
   sondages        SondageVague[]
 }
@@ -46,8 +49,10 @@ model ResultatReel {
   candidat        CandidatOuListe @relation(fields: [candidatId], references: [id])
   voix            BigInt?
   pourcentage     Float           // Score officiel en %
-  sieges          Int?            // Pour législatives et européennes
-  statut          String?         // Elu, Battu, Qualifie
+  sieges          Int?            // Pour législatives, européennes, municipales
+  statut          String?         // Elu, Battu, Qualifie, Maintien, Bascule
+  commune         String?
+  departement     String?
 
   @@unique([electionId, candidatId])
 }
