@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ArrowRightLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ParliamentaryGroup {
   nom: string;
@@ -57,11 +58,13 @@ export function InteractiveHemicycle({
   predictedBlocs,
 }: InteractiveHemicycleProps) {
   const [viewMode, setViewMode] = useState<"dual" | "real" | "predicted">("dual");
+  const [hoveredGroupName, setHoveredGroupName] = useState<string | null>(null);
   const [activeInfo, setActiveInfo] = useState<{
     nom: string;
     sieges: number;
     pct?: number;
     fourchette?: string;
+    couleurHex?: string;
   } | null>(null);
 
   const dots = useMemo(() => generateHemicycleCoords(577), []);
@@ -119,18 +122,18 @@ export function InteractiveHemicycle({
   }, [predictedBlocs]);
 
   const renderHalfHemicycle = (title: string, subtitle: string, isPredicted: boolean) => (
-    <div className="editorial-card p-5 flex flex-col items-center">
-      <div className="w-full flex items-baseline justify-between mb-2 pb-2 border-b border-border">
+    <div className="editorial-card p-5 sm:p-6 flex flex-col items-center relative overflow-hidden">
+      <div className="w-full flex items-baseline justify-between mb-3 pb-3 border-b border-border">
         <div>
-          <h4 className="font-bold text-sm text-foreground">{title}</h4>
+          <h4 className="font-extrabold text-sm sm:text-base text-foreground tracking-tight">{title}</h4>
           <p className="text-[11px] text-muted-foreground">{subtitle}</p>
         </div>
-        <span className="text-xs font-mono font-bold text-muted-foreground">
+        <span className="text-xs font-mono font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
           577 sièges
         </span>
       </div>
 
-      <div className="w-full max-w-[420px] relative">
+      <div className="w-full max-w-[440px] relative py-2">
         <svg viewBox="0 0 500 260" className="w-full h-auto select-none overflow-visible">
           {/* Ligne rouge de la majorité absolue (289 sièges) */}
           <line
@@ -140,15 +143,16 @@ export function InteractiveHemicycle({
             y2="15"
             stroke="#ef4444"
             strokeWidth="1.5"
-            strokeDasharray="3 3"
+            strokeDasharray="4 3"
+            className="opacity-80"
           />
           <text
             x="250"
             y="10"
             textAnchor="middle"
-            className="fill-red-500 dark:fill-red-400 text-[10px] font-bold"
+            className="fill-red-500 dark:fill-red-400 text-[10px] font-bold tracking-wider uppercase"
           >
-            Seuil de majorité absolue : 289
+            Majorité : 289
           </text>
 
           {/* Semicircle tribune floor */}
@@ -160,28 +164,41 @@ export function InteractiveHemicycle({
             strokeWidth="1.5"
           />
 
-          {/* 577 points */}
+          {/* 577 points with dynamic opacity and hover pulse */}
           {dots.map((dot, idx) => {
+            const groupName = isPredicted
+              ? predictedSeatAssignments[idx]?.bloc?.nom
+              : realSeatAssignments[idx]?.group?.nom;
+
             const color = isPredicted
               ? predictedSeatAssignments[idx]?.bloc?.couleurHex || "#94a3b8"
               : realSeatAssignments[idx]?.group?.couleurHex || "#94a3b8";
+
+            const isDimmed = hoveredGroupName !== null && hoveredGroupName !== groupName;
+            const isHighlighted = hoveredGroupName !== null && hoveredGroupName === groupName;
 
             return (
               <circle
                 key={idx}
                 cx={dot.x}
                 cy={dot.y}
-                r="3.2"
+                r={isHighlighted ? "3.8" : "3.0"}
                 fill={color}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={() => {
+                opacity={isDimmed ? 0.25 : 1}
+                className="cursor-pointer transition-all duration-150"
+                onMouseEnter={() => {
+                  if (groupName) setHoveredGroupName(groupName);
                   if (isPredicted) {
                     const b = predictedSeatAssignments[idx]?.bloc;
-                    if (b) setActiveInfo({ nom: b.nom, sieges: b.siegesEstimes, fourchette: `Entre ${b.siegesMin} et ${b.siegesMax} sièges` });
+                    if (b) setActiveInfo({ nom: b.nom, sieges: b.siegesEstimes, fourchette: `Entre ${b.siegesMin} et ${b.siegesMax} sièges`, couleurHex: b.couleurHex });
                   } else {
                     const g = realSeatAssignments[idx]?.group;
-                    if (g) setActiveInfo({ nom: g.nom, sieges: g.sieges, pct: g.pct });
+                    if (g) setActiveInfo({ nom: g.nom, sieges: g.sieges, pct: g.pct, couleurHex: g.couleurHex });
                   }
+                }}
+                onMouseLeave={() => setHoveredGroupName(null)}
+                onClick={() => {
+                  if (groupName) setHoveredGroupName(groupName);
                 }}
               />
             );
@@ -192,45 +209,65 @@ export function InteractiveHemicycle({
       {/* Legend list below */}
       <div className="w-full mt-4 space-y-1.5 pt-3 border-t border-border">
         {isPredicted
-          ? predictedBlocs.slice(0, 5).map((b) => (
-              <div
-                key={b.nom}
-                className="flex items-center justify-between text-xs py-0.5"
-              >
-                <div className="flex items-center gap-2 truncate max-w-[200px]">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: b.couleurHex }}
-                  />
-                  <span className="truncate text-foreground font-medium">{b.nom}</span>
+          ? predictedBlocs.slice(0, 5).map((b) => {
+              const isHovered = hoveredGroupName === b.nom;
+              return (
+                <div
+                  key={b.nom}
+                  onMouseEnter={() => {
+                    setHoveredGroupName(b.nom);
+                    setActiveInfo({ nom: b.nom, sieges: b.siegesEstimes, fourchette: `Entre ${b.siegesMin} et ${b.siegesMax} sièges`, couleurHex: b.couleurHex });
+                  }}
+                  onMouseLeave={() => setHoveredGroupName(null)}
+                  className={`flex items-center justify-between text-xs py-1 px-2 rounded-lg transition-colors cursor-pointer ${
+                    isHovered ? "bg-muted/80 font-bold" : "hover:bg-muted/40"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate max-w-[220px]">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: b.couleurHex }}
+                    />
+                    <span className="truncate text-foreground font-medium">{b.nom}</span>
+                  </div>
+                  <div className="flex items-center gap-2 font-mono">
+                    <span className="text-[11px] text-muted-foreground">
+                      [{b.siegesMin}–{b.siegesMax}]
+                    </span>
+                    <span className="font-bold text-foreground">
+                      ~{b.siegesEstimes}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 font-mono">
-                  <span className="text-[11px] text-muted-foreground">
-                    [{b.siegesMin}–{b.siegesMax}]
+              );
+            })
+          : realGroups.slice(0, 6).map((g) => {
+              const isHovered = hoveredGroupName === g.nom;
+              return (
+                <div
+                  key={g.nom}
+                  onMouseEnter={() => {
+                    setHoveredGroupName(g.nom);
+                    setActiveInfo({ nom: g.nom, sieges: g.sieges, pct: g.pct, couleurHex: g.couleurHex });
+                  }}
+                  onMouseLeave={() => setHoveredGroupName(null)}
+                  className={`flex items-center justify-between text-xs py-1 px-2 rounded-lg transition-colors cursor-pointer ${
+                    isHovered ? "bg-muted/80 font-bold" : "hover:bg-muted/40"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate max-w-[220px]">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: g.couleurHex }}
+                    />
+                    <span className="truncate text-foreground font-medium">{g.nom}</span>
+                  </div>
+                  <span className="font-mono font-bold text-foreground">
+                    {g.sieges} sièges
                   </span>
-                  <span className="font-bold text-foreground">
-                    ~{b.siegesEstimes}
-                  </span>
                 </div>
-              </div>
-            ))
-          : realGroups.slice(0, 6).map((g) => (
-              <div
-                key={g.nom}
-                className="flex items-center justify-between text-xs py-0.5"
-              >
-                <div className="flex items-center gap-2 truncate max-w-[200px]">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: g.couleurHex }}
-                  />
-                  <span className="truncate text-foreground font-medium">{g.nom}</span>
-                </div>
-                <span className="font-mono font-bold text-foreground">
-                  {g.sieges} sièges
-                </span>
-              </div>
-            ))}
+              );
+            })}
       </div>
     </div>
   );
@@ -240,58 +277,73 @@ export function InteractiveHemicycle({
       {/* Switcher header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
         <div>
-          <h3 className="text-lg font-bold text-foreground">
+          <h3 className="text-lg font-bold text-foreground tracking-tight">
             L'Hémicycle : Ce que prévoyaient les sondages vs La réalité élue ({annee})
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            La ligne rouge centrale matérialise le seuil critique de la majorité absolue (289 sièges).
+            La ligne rouge centrale matérialise le seuil critique de la majorité absolue (289 sièges sur 577).
           </p>
         </div>
 
-        <div className="flex items-center gap-1 bg-muted p-1 rounded-lg text-xs self-start sm:self-auto">
-          <button
-            onClick={() => setViewMode("dual")}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all flex items-center gap-1 ${
-              viewMode === "dual"
-                ? "bg-card text-foreground shadow-sm font-semibold"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <ArrowRightLeft className="w-3.5 h-3.5" />
-            <span>Face-à-Face</span>
-          </button>
-          <button
-            onClick={() => setViewMode("predicted")}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-              viewMode === "predicted"
-                ? "bg-card text-foreground shadow-sm font-semibold"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Sondages
-          </button>
-          <button
-            onClick={() => setViewMode("real")}
-            className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-              viewMode === "real"
-                ? "bg-card text-foreground shadow-sm font-semibold"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Réalité élue
-          </button>
+        <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl text-xs self-start sm:self-auto border border-border/50">
+          {[
+            { id: "dual", label: "Face-à-Face", icon: ArrowRightLeft },
+            { id: "predicted", label: "Sondages", icon: null },
+            { id: "real", label: "Réalité élue", icon: null },
+          ].map((mode) => {
+            const Icon = mode.icon;
+            return (
+              <button
+                key={mode.id}
+                onClick={() => setViewMode(mode.id as any)}
+                className="relative px-3 py-1.5 rounded-lg font-semibold transition-colors text-xs z-10 text-muted-foreground hover:text-foreground flex items-center gap-1.5"
+              >
+                {viewMode === mode.id && (
+                  <motion.div
+                    layoutId="hemicycleModePill"
+                    className="absolute inset-0 bg-card rounded-lg shadow-sm border border-border -z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                <span className={viewMode === mode.id ? "text-foreground font-bold" : ""}>
+                  {mode.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Selected item highlight banner */}
-      {activeInfo && (
-        <div className="p-3 rounded-lg bg-secondary/80 border border-border text-xs flex items-center justify-between">
-          <span className="font-bold text-foreground">{activeInfo.nom}</span>
-          <span className="font-mono font-bold text-foreground">
-            {activeInfo.fourchette || `${activeInfo.sieges} sièges`}
-          </span>
-        </div>
-      )}
+      {/* Selected item highlight banner with fluid animation */}
+      <AnimatePresence>
+        {activeInfo && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="p-3.5 rounded-xl bg-card border border-border/80 shadow-sm text-xs flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2.5">
+              {activeInfo.couleurHex && (
+                <span
+                  className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
+                  style={{ backgroundColor: activeInfo.couleurHex }}
+                />
+              )}
+              <span className="font-extrabold text-foreground">{activeInfo.nom}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="font-mono font-bold text-foreground">
+                {activeInfo.fourchette || `${activeInfo.sieges} sièges`}
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                ({((activeInfo.sieges / 577) * 100).toFixed(1)}% de l'Assemblée)
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Grid */}
       <div

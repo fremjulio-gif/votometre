@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%; /* #FAFAFA warm paper-like white */
+    --background: 0 0% 99%; /* #FCFCFD ultra clean paper */
     --foreground: 222 47% 11%; /* #0F172A deep readable slate */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
@@ -20,55 +20,160 @@
     --accent-foreground: 222 47% 11%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%; /* subtle clean border */
+    --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 221 83% 45%;
-    --radius: 0.625rem;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222 47% 9%; /* #0B1120 deep neutral slate */
+    --background: 222 47% 7%; /* #070B14 deep obsidian slate */
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%; /* #0F172A */
+    --card: 222 47% 10%; /* #0D1322 */
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 222 47% 10%;
     --popover-foreground: 210 40% 98%;
     --primary: 217 91% 60%;
     --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
+    --secondary: 217 33% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 16%;
+    --muted: 217 33% 14%;
     --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
+    --accent: 217 33% 16%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62% 30%;
+    --destructive: 0 62% 35%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 224 76% 48%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 52%;
   }
 }
 
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings: "rlig" 1, "calt" 1, "cv02" 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.02) 0px, transparent 40%),
+    radial-gradient(at 90% 90%, rgba(244, 63, 94, 0.02) 0px, transparent 40%);
+  background-attachment: fixed;
 }
 
-/* Minimalist Editorial Card */
+.dark body {
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.04) 0px, transparent 45%),
+    radial-gradient(at 90% 90%, rgba(139, 92, 246, 0.04) 0px, transparent 45%);
+}
+
+/* Minimalist Editorial Card with Juicy Hover Elevation */
 .editorial-card {
   background-color: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.editorial-card:hover {
+  border-color: rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.04), 0 2px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+.dark .editorial-card:hover {
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* Subtle Interactive Glass Panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .glass-panel {
+  background: rgba(13, 19, 34, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Tactile Pill Tab */
+.pill-tab {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-tab:active {
+  transform: scale(0.97);
+}
+
+/* Clean Progress Bar with Soft Shimmer */
+.shimmer-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Dot Indicator with Ambient Glow */
+.dot-pulse {
+  position: relative;
+}
+
+.dot-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.3;
+  animation: pulse-ring 2.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
 
 /* Subtle clean scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -76,6 +181,7 @@ body {
 ::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.3);
   border-radius: 9999px;
+  transition: background 0.2s;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.5);
