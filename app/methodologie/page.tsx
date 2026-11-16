@@ -1,139 +1,138 @@
-import { Compass, ShieldCheck, Database, CheckCircle2, Scale } from "lucide-react";
+import Link from "next/link";
+import { Download, CheckCircle2, HelpCircle } from "lucide-react";
 
 export const metadata = {
-  title: "Méthodologie & Formules Statistiques — Le Votomètre",
+  title: "Les Règles du Jeu : Comprendre la Méthode — Le Votomètre",
   description:
-    "Comprendre le calcul de la MAE, la formule des marges d'erreur de Bernoulli et les critères d'évaluation des sondages électoraux sur Le Votomètre.",
+    "Pourquoi les sondages ne sont pas des prédictions magiques, qu'est-ce qu'une marge d'erreur, et pourquoi 1 point d'écart n'est pas une erreur.",
 };
 
 export default function MethodologiePage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      {/* Header */}
-      <div className="border-b border-zinc-800 pb-6">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 text-indigo-300 text-xs font-semibold mb-2 border border-indigo-700/60">
-          <Compass className="w-3.5 h-3.5" />
-          <span>Rigueur &amp; Réfutabilité Scientifique</span>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Méthodologie &amp; Moteur Statistique
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-12">
+      {/* Editorial Title */}
+      <div className="space-y-3 border-b border-border pb-6">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">
+          Pédagogie &amp; Rigueur
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+          Les Règles du Jeu
         </h1>
-        <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
-          Le Votomètre est un observatoire citoyen et non partisan. Notre démarche est strictement analytique : elle repose sur des données officielles proclamées et des métriques statistiques éprouvées.
+        <p className="text-base text-muted-foreground leading-relaxed">
+          Un guide simple pour comprendre ce que les sondages peuvent dire — et ce qu'ils ne pourront jamais prédire.
         </p>
       </div>
 
-      {/* Section 1 : Les 3 Métriques Fondamentales */}
-      <section className="space-y-6">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Scale className="w-5 h-5 text-indigo-400" />
-          1. Les 3 Métriques Mathématiques
-        </h2>
-
-        <div className="space-y-6">
-          {/* Formule 1 : Signed Error */}
-          <div className="glass-panel p-6 rounded-2xl border border-zinc-800 space-y-3">
-            <h3 className="font-bold text-white text-base">
-              A. L'Écart Simple ou Erreur Signée (Signed Error)
-            </h3>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Pour chaque candidat ou liste mesuré par un institut sur une élection donnée :
-            </p>
-            <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 font-mono text-sm text-indigo-300 text-center">
-              {"Δ = Score Réel (%) - Score Sondé (%)"}
-            </div>
-            <ul className="text-xs text-zinc-400 space-y-1.5 list-disc pl-5">
-              <li>
-                <strong className="text-emerald-400">Δ &gt; 0 (Sous-estimation) :</strong> Le candidat a réalisé un score supérieur aux intentions sondées (dynamique tardive, vote utile ou vote caché).
-              </li>
-              <li>
-                <strong className="text-rose-400">Δ &lt; 0 (Sur-estimation) :</strong> Le candidat a réalisé un score inférieur aux intentions sondées (bulle médiatique, déperdition de participation).
-              </li>
-              <li>
-                <strong className="text-indigo-400">|Δ| ≤ 1.5 pt :</strong> L'estimation se situe dans l'intervalle d'incertitude statistique standard.
-              </li>
-            </ul>
-          </div>
-
-          {/* Formule 2 : MAE */}
-          <div className="glass-panel p-6 rounded-2xl border border-zinc-800 space-y-3">
-            <h3 className="font-bold text-white text-base">
-              B. L'Erreur Absolue Moyenne (MAE — Mean Absolute Error)
-            </h3>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              La MAE constitue le standard d'or international (adopté par Nate Silver et FiveThirtyEight) pour mesurer la précision globale d'un institut sur un ensemble de N mesures :
-            </p>
-            <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 font-mono text-sm text-amber-300 text-center">
-              {"MAE_k = (1 / N) * Σ |Score Réel_i - Score Sondé_{i,k}|"}
-            </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Contrairement à la moyenne simple qui compense artificiellement les sous-estimations par les sur-estimations, la MAE pénalise chaque point d'écart à sa juste valeur.
-            </p>
-          </div>
-
-          {/* Formule 3 : Bernoulli */}
-          <div className="glass-panel p-6 rounded-2xl border border-zinc-800 space-y-3">
-            <h3 className="font-bold text-white text-base">
-              C. La Marge d'Erreur Théorique (Intervalle de Bernoulli à 95%)
-            </h3>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Pour un échantillon aléatoire simple de taille n et une proportion observée p :
-            </p>
-            <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 font-mono text-sm text-emerald-300 text-center">
-              {"Marge d'erreur = ± 1.96 * √[p * (1 - p) / n]"}
-            </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Pour un score à 20% mesuré sur un échantillon classique de 1 000 électeurs, la marge théorique est de <strong>±2,47 points</strong>.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 2 : Sources certifiées */}
-      <section className="space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Database className="w-5 h-5 text-indigo-400" />
-          2. Sources Officielles et Périmètre
-        </h2>
-        <div className="glass-panel p-6 rounded-2xl border border-zinc-800 space-y-4">
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-bold text-white">
-                Conseil constitutionnel &amp; Ministère de l'Intérieur
-              </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed mt-0.5">
-                Les scores officiels retenus sont exclusivement les résultats définitifs proclamés par le Conseil constitutionnel (pour les présidentielles) et validés par le Ministère de l'Intérieur (pour les législatives et européennes).
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-bold text-white">
-                Notices de la Commission des sondages
-              </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed mt-0.5">
-                Tous les sondages recensés sont issus des vagues enregistrées auprès de la Commission des sondages, garantissant le respect de la législation française (taille d'échantillon, méthode des quotas, date de terrain).
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Neutrality pledge */}
-      <section className="p-6 rounded-2xl bg-zinc-900/90 border border-zinc-700/60 flex items-center gap-4">
-        <ShieldCheck className="w-8 h-8 text-emerald-400 shrink-0" />
-        <div>
-          <h4 className="text-sm font-bold text-white">
-            Engagement d'Impartialité &amp; Réfutabilité
-          </h4>
-          <p className="text-xs text-zinc-400 leading-relaxed mt-1">
-            Le Votomètre n'est financé par aucun parti politique ni aucun institut de sondage. L'ensemble des données, formules et codes sources est vérifiable et auditable.
+      {/* Article Body */}
+      <article className="space-y-10 text-sm sm:text-base text-foreground/90 leading-relaxed">
+        {/* Section 1 */}
+        <section className="space-y-3">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">
+            1. Pourquoi un sondage n'est pas une prédiction magique
+          </h2>
+          <p className="text-muted-foreground">
+            Un sondage n'est pas une boule de cristal : c'est une <strong>photographie instantanée</strong> de l'opinion à un instant T, réalisée auprès d'un échantillon représentatif d'environ 1 000 à 2 000 personnes.
           </p>
-        </div>
-      </section>
+          <p className="text-muted-foreground">
+            Entre le moment où l'enquête est réalisée (souvent 48h à 72h avant le vote) et le moment où l'électeur glisse son bulletin dans l'urne, beaucoup de choses peuvent basculer : l'effet du dernier débat télévisé, le choix stratégique du vote utile, ou encore la météo et l'abstention différentielle.
+          </p>
+        </section>
+
+        {/* Section 2 */}
+        <section className="space-y-3">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">
+            2. Qu'est-ce qu'une marge d'erreur statistique ?
+          </h2>
+          <p className="text-muted-foreground">
+            Interroger 1 000 personnes pour connaître le choix de 48 millions de citoyens induit mathématiquement une incertitude incompressible. C'est ce qu'on appelle la <strong>marge d'erreur</strong> (ou intervalle de confiance à 95%).
+          </p>
+          <div className="p-4 rounded-xl bg-muted/60 border border-border space-y-2 text-sm">
+            <span className="font-bold text-foreground block">
+              La règle simple à retenir :
+            </span>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              Pour un candidat crédité de <strong>20%</strong> dans un sondage de 1 000 personnes, son score réel a 95% de chances de se situer entre <strong>17,5% et 22,5%</strong> (soit une fourchette de ±2,5 points).
+            </p>
+          </div>
+        </section>
+
+        {/* Section 3 */}
+        <section className="space-y-3">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">
+            3. Pourquoi 1 point d'écart n'est pas une "erreur", mais 4 points changent l'Histoire
+          </h2>
+          <p className="text-muted-foreground">
+            Lorsqu'un candidat est sondé à 24% et obtient 24,8% le dimanche soir, <strong>le sondage a parfaitement vu juste</strong> : l'écart de 0,8 point est totalement normal sur le plan statistique.
+          </p>
+          <p className="text-muted-foreground">
+            En revanche, lorsqu'un candidat comme Jean-Marie Le Pen en 2002 est sondé à 13% et termine à 16,9% (+3,9 points au-delà des prévisions), il s'agit d'une <strong>sous-estimation majeure</strong>. Dans un scrutin uninominal à deux tours, ces 4 points d'écart ont provoqué l'élimination du Premier ministre sortant Lionel Jospin et bouleversé l'histoire politique française.
+          </p>
+        </section>
+
+        {/* Section 4 */}
+        <section className="space-y-3">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">
+            4. Comment nous calculons la précision
+          </h2>
+          <p className="text-muted-foreground">
+            Plutôt que des formules complexes, Le Votomètre utilise la <strong>marge d'erreur moyenne</strong> (appelée MAE par les statisticiens) :
+          </p>
+          <div className="p-4 rounded-xl border border-border bg-card space-y-1.5 text-xs text-muted-foreground">
+            <p>
+              Pour chaque élection et chaque institut, nous mesurons l'écart en points absolu pour chaque candidat. Nous faisons ensuite la moyenne de tous ces écarts.
+            </p>
+            <p className="font-semibold text-foreground">
+              Plus ce chiffre est proche de 0, plus le sondeur a vu clair.
+            </p>
+          </div>
+        </section>
+
+        {/* Section 5 : Sources et Open Data */}
+        <section className="space-y-4 pt-4 border-t border-border">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">
+            5. Sources certifiées &amp; Fichiers ouverts
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Toutes les données utilisées sont publiques, vérifiables et téléchargeables au format Excel (.xlsx) :
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 rounded-lg border border-border bg-card flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-foreground block">
+                  Résultats officiels proclamés
+                </span>
+                <span className="text-muted-foreground text-[11px]">
+                  Conseil constitutionnel &amp; Ministère de l'Intérieur (2002–2024)
+                </span>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-lg border border-border bg-card flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-foreground block">
+                  Notices des sondages certifiées
+                </span>
+                <span className="text-muted-foreground text-[11px]">
+                  Commission des sondages &amp; instituts adhérents SYNTEC
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+
+      {/* Return to Home CTA */}
+      <div className="pt-6 border-t border-border text-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-xs transition-opacity hover:opacity-90"
+        >
+          <span>Retourner au Flash Électoral</span>
+        </Link>
+      </div>
     </div>
   );
 }

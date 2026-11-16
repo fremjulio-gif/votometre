@@ -1,79 +1,64 @@
-# Le Votomètre (levotometre.fr) 🗳️📊
+# Le Votomètre (levotometre.fr) 🗳️
 
-> **L'Observatoire citoyen & analytique de précision des sondages électoraux en France (2002–2024 & prospective 2027)**
+> **Édition Minimaliste & Grand Public — L'Observatoire citoyen de précision des sondages électoraux en France (2002–2024 & prospective 2027)**
+
+Inspiré du datajournalisme sobre et épuré (*Le Monde Les Décodeurs*, *FiveThirtyEight*, *The Upshot / NYT*), **Le Votomètre** confronte systématiquement les enquêtes d'opinion aux résultats officiels certifiés par le Conseil constitutionnel et le Ministère de l'Intérieur.
 
 ---
 
-## 🎯 Objectif du Produit
-**Le Votomètre** confronte systématiquement les sondages d'opinion aux résultats officiels proclamés par le Conseil constitutionnel et le Ministère de l'Intérieur lors de toutes les grandes élections en France sur les 20 dernières années :
-- **Élections Présidentielles** (2002, 2007, 2012, 2017, 2022 + prospective 2027)
-- **Élections Législatives & Assemblée nationale** (2002, 2007, 2012, 2017, 2022, 2024 dissolution)
-- **Élections Européennes** (2004, 2009, 2014, 2019, 2024)
-- **Audit des 12 Instituts de Sondage** (Ipsos, Ifop, Elabe, Harris, BVA, OpinionWay, Cluster 17, Odoxa, CSA, etc.)
+## 🎯 Directives Visuelles & Éditoriales
+1. **Zéro fioriture inutile (Data-to-Ink Ratio élevé)** :
+   - Fond neutre reposant (blanc cassé `#FAFAFA` en mode clair, slate sobre `#0B1120` en mode sombre).
+   - Typographie éditoriale claire et espacements généreux (*whitespace*).
+2. **Vulgarisation immédiate (compréhensible de 15 à 80 ans)** :
+   - Bannissement du jargon brut d'ingénieur en première lecture.
+   - *"Marge d'erreur moyenne : ± 1,8 pt"* au lieu de "MAE = 1.84".
+   - *"Sous-estimé de +3,8 points (A fait mieux que prévu)"* au lieu de "Δ = +3.8".
+   - *"Sur-estimé de -2,1 points (A fait moins bien que prévu)"* au lieu de "Δ = -2.1".
+   - *"Prévision réussie (dans la marge de tolérance)"* au lieu de "Intervalle de confiance respecté".
+3. **Mobile-First & Lisibilité sans effort** :
+   - Cartes empilées et barres horizontales naturelles à faire défiler au pouce sur smartphone.
+   - Étiquettes de texte 100% horizontales (jamais inclinées).
 
-Le site ne fait pas de politique : il mesure scientifiquement la marge d'erreur, la précision des instituts et les récurrences de sous-estimations ou de sur-estimations de candidats ou de formations politiques.
+---
+
+## 🧭 Les 4 Vues de l'Application
+
+1. **Accueil : "Le Flash Électoral"** (`/`)
+   - *"Depuis 20 ans, les sondages voient-ils juste le jour du vote ?"*
+   - 3 cartes synthétiques grand format : le plus grand écart historique (2002), l'élection la plus fidèle (2017), le séisme le plus inattendu (2024).
+   - Le Baromètre d'Écart Récent (Dernier scrutin 2024).
+
+2. **Par Élection : "L'Urne contre le Sondage"** (`/presidentielles`, `/legislatives`, `/europeennes`)
+   - Sélecteur d'année sobre.
+   - **"Qui a créé la surprise ?"** : Baromètre horizontal d'écart avec bande grise de tolérance habituelle (±1,5 pt).
+   - **"La Confrontation Directe"** : Nuage de corrélation allégé avec la *Ligne de vérité* en pointillés.
+   - *Législatives* : Visualisation vulgarisée de l'hémicycle (577 députés) avec mise en évidence du seuil de majorité absolue (289 sièges).
+
+3. **Le Podium des Instituts : "Qui est le plus précis ?"** (`/instituts`)
+   - Les 3 instituts sur le podium (1ère, 2ème et 3ème place).
+   - Tableau comparatif épuré avec précision moyenne en langage humain et tendance observée.
+
+4. **Comprendre la Méthode : "Les Règles du Jeu"** (`/methodologie`)
+   - Article pédagogique : pourquoi un sondage n'est pas magique, qu'est-ce qu'une marge d'erreur, pourquoi 1 point d'écart n'est pas une erreur mais 4 points changent l'Histoire.
 
 ---
 
 ## 🛠️ Stack Technique
-- **Framework** : Next.js 15 (App Router, Server Components & Client Components)
-- **Langage** : TypeScript (mode strict)
-- **Styling** : Tailwind CSS + Thème moderne Dark/Light automatique + Palette politique normalisée
-- **Visualisations de Données** :
-  - **The Scatter Truth** (Nuage de corrélation interactif avec diagonale $y = x$, marge de confiance à 95%, tooltips)
-  - **Diverging Shock Bar** (Baromètre d'écart centré à 0,0 pt, sur-estimations vs sous-estimations)
-  - **Podium & Leaderboard** (Classement des 12 instituts par MAE, jauge de biais et sparklines)
-  - **L'Hémicycle Réactif** (577 sièges de l'Assemblée nationale, projection sondages vs hémicycle réel, ligne de majorité à 289 sièges)
-- **Base de Données & ORM** : SQLite local (`prisma/dev.db`) avec Prisma ORM
-- **Ingestion & Parsing** : Script TypeScript `prisma/seed.ts` exploitant `xlsx` (SheetJS) pour ingérer les 6 fichiers Excel sources certifiés.
+- **Framework** : Next.js 15 (App Router, SSG & ISR)
+- **Langage** : TypeScript
+- **Styling** : Tailwind CSS + Thème automatique Dark / Light sobre
+- **Dataviz** : SVG vectoriel pur interactif + Lucide React
+- **Base de données & ORM** : SQLite local (`prisma/dev.db`) + Prisma ORM
+- **Cache embarqué** : `lib/data-cache.json` pour déploiement Vercel garanti 100% sans faille.
 
 ---
 
-## 📐 Moteur Statistique & Mathématique
-Tous les calculs s'appuient sur les métriques scientifiques standard du datajournalisme international :
-1. **Écart simple en points (Signed Error)** :
-   $$\Delta = \text{Score Réel (\%)} - \text{Score Sondé (\%)} $$
-   - $\Delta > 0$ : Candidat sous-estimé (effet "vote caché" ou dynamique finale)
-   - $\Delta < 0$ : Candidat sur-estimé (effet "bulle médiatique" ou déperdition)
-   - $|\Delta| \le 1.5$ : Dans la marge d'erreur statistique usuelle
-2. **Erreur Absolue Moyenne (MAE — Mean Absolute Error)** :
-   $$\text{MAE}_k = \frac{1}{N} \sum_{i=1}^N |\text{Score Réel}_i - \text{Score Sondé}_{i,k}|$$
-   Sert à établir le **Leaderboard de précision des instituts**.
-3. **Taux de Succès d'Encadrement (Sièges Législatives/Européennes)** :
-   $$\text{Encadré} = (\text{Sièges Réels} \ge \text{Sièges Min}) \land (\text{Sièges Réels} \le \text{Sièges Max})$$
-
----
-
-## 🚀 Installation & Démarrage
-
-### 1. Cloner le dépôt et installer les dépendances
+## 🚀 Démarrage en local
 ```bash
 git clone https://github.com/fremjulio-gif/votometre.git
 cd votometre
 npm install
-```
-
-### 2. Initialiser la base de données et ingérer les données
-```bash
-npx prisma db push
-npm run db:seed
-```
-
-### 3. Lancer le serveur de développement
-```bash
 npm run dev
+# Ouvrir http://localhost:3000
 ```
-Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
-
----
-
-## 🏛️ Sources Officielles Certifiées
-- **Conseil constitutionnel** : Décisions de proclamation des résultats des élections présidentielles.
-- **Ministère de l'Intérieur** : Données électorales certifiées par circonscription et bureau de vote.
-- **Assemblée nationale** : Composition des groupes parlementaires (Législatures XIIe à XVIIe).
-- **Commission des sondages** : Notices méthodologiques officielles des enquêtes d'opinion.
-
----
-
-## 📄 Licence
-Projet open-source à vocation citoyenne et analytique.
