@@ -3,7 +3,7 @@ import { getConsensusPointsByElection, getProspectif2027Data } from "@/lib/data"
 import { PresidentiellesClient } from "@/components/PresidentiellesClient";
 import { ScrutinType } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Présidentielles (2002–2027) — Le Votomètre",
@@ -65,18 +65,18 @@ export default async function PresidentiellesPage() {
   const prospectifData = {
     annee: 2027,
     vagues:
-      rawProspectif?.sondages.map((s) => ({
-        institut: s.institut.nom,
+      rawProspectif?.sondages?.map((s: any) => ({
+        institut: s.institut?.nom || s.institut,
         commanditaire: s.commanditaire,
-        datePublication: s.datePublication.toISOString().split("T")[0],
-        hypothese: s.statut || "Hypothèse 2027",
-        mesures: s.mesures.map((m) => ({
-          candidatNom: m.candidat.nom,
-          parti: m.candidat.parti,
-          famille: m.candidat.famille,
-          couleurHex: m.candidat.couleurHex,
-          intentionPct: m.intentionVotePct,
-        })),
+        datePublication: s.datePublication instanceof Date ? s.datePublication.toISOString().split("T")[0] : String(s.datePublication).split("T")[0],
+        hypothese: s.statut || s.hypothese || "Hypothèse 2027",
+        mesures: s.mesures?.map((m: any) => ({
+          candidatNom: m.candidat?.nom || m.candidatNom,
+          parti: m.candidat?.parti || m.parti,
+          famille: m.candidat?.famille || m.famille,
+          couleurHex: m.candidat?.couleurHex || m.couleurHex,
+          intentionPct: m.intentionVotePct || m.intentionPct,
+        })) || [],
       })) || [],
   };
 

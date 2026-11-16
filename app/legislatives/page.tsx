@@ -1,7 +1,7 @@
 import { getLegislativesHemicycleData } from "@/lib/data";
 import { LegislativesClient } from "@/components/LegislativesClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Législatives & Hémicycle (2002–2024) — Le Votomètre",
@@ -28,10 +28,10 @@ export default async function LegislativesPage() {
     if (!data) continue;
 
     // Build comparisons
-    const comparisons = data.predictedBlocs.map((pb) => {
+    const comparisons = data.predictedBlocs.map((pb: any) => {
       // Find matching real group or coalition
       const matchingReal = data.realGroups.find(
-        (rg) =>
+        (rg: any) =>
           rg.nom.toLowerCase().includes(pb.nom.toLowerCase().slice(0, 10)) ||
           pb.nom.toLowerCase().includes(rg.nom.toLowerCase().slice(0, 10))
       );

@@ -2,7 +2,7 @@ import { getLeaderboardInstituts } from "@/lib/data";
 import { LeaderboardPodium } from "@/components/dataviz/LeaderboardPodium";
 import { Award, ShieldCheck, HelpCircle, Activity, Info, BarChart2 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Leaderboard des Instituts de Sondage — Le Votomètre",

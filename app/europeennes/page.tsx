@@ -3,7 +3,7 @@ import { getConsensusPointsByElection } from "@/lib/data";
 import { EuropeennesClient } from "@/components/EuropeennesClient";
 import { ScrutinType } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "Élections Européennes (2004–2024) — Le Votomètre",

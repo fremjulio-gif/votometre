@@ -22,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function HomePage() {
   const [macro, allPoints, instituts] = await Promise.all([
